@@ -20,7 +20,7 @@ export const profile = {
 
 export const stats = [
   { value: 8, suffix: '+', label: 'years shipping Flutter' },
-  { value: 3, suffix: '', label: 'production apps I own today' },
+  { value: 20, suffix: '+', label: 'white-label apps built & shipped' },
   { value: 99, suffix: '%+', label: 'crash-free sessions' },
   { value: 198, suffix: '', label: 'teams in the XPRIZE we won' },
 ];
@@ -57,12 +57,13 @@ export const experience: Job[] = [
     start: 'Jul 2019',
     end: 'Jan 2025',
     points: [
-      'Led the Flutter codebase for five and a half years and carried it through several major Flutter upgrades without breaking clients.',
-      'Ran a multi-tenant white-label setup: one codebase, many branded apps, all released through Fastlane pipelines.',
+      'Built the OutreachCircle app from scratch, published it to the App Store and Google Play, and kept it maintained and updated for five and a half years.',
+      'Built and shipped 20+ white-label apps for clients from the same codebase — each one taken from setup through both store releases and ongoing updates, automated with Fastlane.',
+      'Carried the codebase through several major Flutter upgrades without breaking a single client app.',
       'Introduced BLoC and Provider, UI automation tests, and full English/Spanish localization.',
       'Pitched in on the React and Next.js web side when the team needed it.',
     ],
-    tags: ['Flutter', 'BLoC', 'Fastlane', 'White-label', 'i18n'],
+    tags: ['Flutter', 'OutreachCircle', 'White-label', 'Fastlane', 'i18n'],
   },
   {
     company: 'Sutara Learning Foundation',
@@ -105,6 +106,14 @@ export const projects: Project[] = [
     accent: '#7C8CFF',
   },
   {
+    title: 'OutreachCircle',
+    kind: 'Work · iOS & Android',
+    blurb:
+      'Relational organizing app for campaigns and nonprofits. I built it from the first commit, shipped it to both stores, and spun 20+ branded white-label versions out of the same codebase.',
+    tags: ['Flutter', 'White-label', 'Fastlane'],
+    accent: '#5EEAD4',
+  },
+  {
     title: 'CHIMPLE',
     kind: 'XPRIZE winner · Open source',
     blurb:
@@ -114,12 +123,29 @@ export const projects: Project[] = [
     accent: '#FFB547',
   },
   {
-    title: 'Flow Track',
-    kind: 'Side project',
-    blurb: 'Personal finance tracker — where the money went, and where it should go next month.',
-    tags: ['Flutter', 'Local storage'],
-    url: 'https://github.com/ManukumarSB/flow-track-flutter',
+    title: 'My Event',
+    kind: 'Personal · Web + iOS & Android',
+    blurb:
+      'Started as a wedding planner, grew into a general event planner. Budget and expense tracking, guest list, shared invites and a countdown to the day — a Next.js web app with a Flutter companion.',
+    tags: ['Next.js', 'Flutter', 'Firebase', 'Tailwind'],
+    accent: '#FF7AB6',
+  },
+  {
+    title: 'MyDay',
+    kind: 'Personal · iOS & Android',
+    blurb:
+      'Habits and tasks with weekly insights. An excuse to go all-in on motion: Lottie onboarding, animated theme switching, micro-interactions everywhere.',
+    tags: ['Flutter', 'Lottie', 'Hive', 'i18n'],
     accent: '#3EE0A1',
+  },
+  {
+    title: 'FlowTrack',
+    kind: 'Personal · Android, iOS & Web',
+    blurb:
+      'Personal finance from one codebase: multiple accounts, savings goals with progress estimates, and monthly reports that tell you where the money went.',
+    tags: ['Flutter', 'Firebase', 'fl_chart'],
+    url: 'https://github.com/ManukumarSB/flow-track-flutter',
+    accent: '#2B7FFF',
   },
   {
     title: 'Gen AI PDF Chat',
@@ -130,11 +156,11 @@ export const projects: Project[] = [
     accent: '#FF6B4A',
   },
   {
-    title: 'Flutter CI/CD',
+    title: 'Dart MCP Server',
     kind: 'Experiment',
-    blurb: 'A small reference for building and shipping Flutter apps on every push with Codemagic.',
-    tags: ['CI/CD', 'Codemagic'],
-    url: 'https://github.com/ManukumarSB/flutter_ci_cd_demo',
+    blurb:
+      'A Model Context Protocol server written in pure Dart — STDIO, WebSocket and HTTP transports — so AI assistants can call tools built in the language I use every day.',
+    tags: ['Dart', 'MCP', 'AI tooling'],
     accent: '#C38BFF',
   },
 ];
