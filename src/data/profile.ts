@@ -198,4 +198,4 @@ export const offline = [
 export const nowLearning = 'On-device AI and edge RAG in Flutter, and more Next.js on the web side.';
 
 // Published packages. Stats are fetched from pub.dev at build time.
-export const packageNames = ['keyboard_dock', 'sms_composer_sheet'];
+export const packageNames = ['preloaded_page_view', 'keyboard_dock', 'sms_composer_sheet'];

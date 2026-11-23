@@ -7,7 +7,8 @@ export type PubPackage = {
   published: string;
   likes: number;
   downloads: number;
-  points: number;
+  /// null while pub.dev is still analyzing a freshly published version.
+  points: number | null;
   maxPoints: number;
   platforms: string[];
   repository?: string;
@@ -28,6 +29,19 @@ const fallback: Record<string, PubPackage> = {
     maxPoints: 160,
     platforms: ['android', 'ios', 'web', 'macos', 'windows', 'linux'],
     repository: 'https://github.com/ManukumarSB/keyboard_doc',
+  },
+  preloaded_page_view: {
+    name: 'preloaded_page_view',
+    version: '0.1.0',
+    description:
+      'A PageView that builds the next and previous N pages ahead of time, so videos, images and feeds are ready before you swipe. Zero dependencies.',
+    published: '2026-11-23',
+    likes: 0,
+    downloads: 0,
+    points: null,
+    maxPoints: 160,
+    platforms: ['android', 'ios', 'web', 'macos', 'windows', 'linux'],
+    repository: 'https://github.com/ManukumarSB/preloaded_page_view',
   },
   sms_composer_sheet: {
     name: 'sms_composer_sheet',
@@ -50,6 +64,14 @@ async function getJson(url: string): Promise<any> {
   return res.json();
 }
 
+// pub.dev returns no platform tags until it has analyzed a new version.
+function platformsFrom(tags: string[] | undefined): string[] | null {
+  const platforms = (tags ?? [])
+    .filter((t) => t.startsWith('platform:'))
+    .map((t) => t.replace('platform:', ''));
+  return platforms.length ? platforms : null;
+}
+
 async function fetchOne(name: string): Promise<PubPackage> {
   try {
     const [info, score] = await Promise.all([
@@ -64,11 +86,9 @@ async function fetchOne(name: string): Promise<PubPackage> {
       published: String(info.latest.published).slice(0, 10),
       likes: score.likeCount ?? 0,
       downloads: score.downloadCount30Days ?? 0,
-      points: score.grantedPoints ?? 0,
-      maxPoints: score.maxPoints ?? 160,
-      platforms: (score.tags as string[])
-        .filter((t) => t.startsWith('platform:'))
-        .map((t) => t.replace('platform:', '')),
+      points: score.maxPoints ? score.grantedPoints ?? 0 : null,
+      maxPoints: score.maxPoints || 160,
+      platforms: platformsFrom(score.tags) ?? fallback[name]?.platforms ?? [],
       repository: pubspec.repository ?? pubspec.homepage,
     };
   } catch (err) {

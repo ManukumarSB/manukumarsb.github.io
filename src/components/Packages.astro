@@ -7,7 +7,12 @@ const totals = {
   count: packages.length,
   downloads: packages.reduce((n, p) => n + p.downloads, 0),
   likes: packages.reduce((n, p) => n + p.likes, 0),
-  points: Math.round(packages.reduce((n, p) => n + p.points / p.maxPoints, 0) / packages.length * 100),
+  // Packages still being analyzed don't count toward the average.
+  points: (() => {
+    const scored = packages.filter((p) => p.points !== null);
+    if (!scored.length) return 0;
+    return Math.round((scored.reduce((n, p) => n + p.points! / p.maxPoints, 0) / scored.length) * 100);
+  })(),
 };
 const builtAt = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 const R = 34;
@@ -39,15 +44,22 @@ const C = 2 * Math.PI * R;
 
     <div class="oss__grid">
       {packages.map((p) => {
-        const ratio = p.points / p.maxPoints;
+        const pending = p.points === null;
+        const ratio = pending ? 0 : p.points! / p.maxPoints;
         return (
           <article class="pkg" data-spotlight data-tilt data-reveal>
             <div class="pkg__top">
               <div>
-                <h3 class="pkg__name mono">{p.name}</h3>
+                <h3 class="pkg__name mono">
+                  {/* Long names wrap at underscores, never mid-word. */}
+                  {p.name.split('_').map((part, i) => (i ? <>_<wbr />{part}</> : part))}
+                </h3>
                 <p class="pkg__ver mono">v{p.version} · {p.published}</p>
               </div>
-              <div class="ring" aria-label={`${p.points} of ${p.maxPoints} pub points`}>
+              <div
+                class:list={['ring', { 'ring--pending': pending }]}
+                aria-label={pending ? 'pub score pending' : `${p.points} of ${p.maxPoints} pub points`}
+              >
                 <svg viewBox="0 0 80 80">
                   <circle cx="40" cy="40" r={R} class="ring__bg" />
                   <circle
@@ -59,7 +71,9 @@ const C = 2 * Math.PI * R;
                     data-ring-full={C}
                   />
                 </svg>
-                <span class="ring__label"><b>{p.points}</b><small>pts</small></span>
+                <span class="ring__label">
+                  {pending ? <><b>…</b><small>scoring</small></> : <><b>{p.points}</b><small>pts</small></>}
+                </span>
               </div>
             </div>
 
@@ -84,7 +98,9 @@ const C = 2 * Math.PI * R;
         );
       })}
 
-      <a class="pkg pkg--next" href={profile.links.github} target="_blank" rel="noopener" data-reveal>
+      <a
+        class:list={['pkg', 'pkg--next', { 'pkg--wide': packages.length % 3 === 0 }]}
+        href={profile.links.github} target="_blank" rel="noopener" data-reveal>
         <span class="pkg__plus" aria-hidden="true">+</span>
         <p class="pkg__next-title">More on the way</p>
         <p class="pkg__desc">I publish a new one whenever a problem keeps coming back. Follow along on GitHub.</p>
@@ -193,7 +209,7 @@ const C = 2 * Math.PI * R;
     margin: 0;
     font-size: 19px;
     font-weight: 600;
-    word-break: break-word;
+    overflow-wrap: anywhere;
   }
   .pkg__ver {
     margin: 6px 0 0;
@@ -221,6 +237,17 @@ const C = 2 * Math.PI * R;
   .ring__fg {
     stroke: var(--mint);
     stroke-linecap: round;
+  }
+  .ring--pending .ring__bg {
+    stroke-dasharray: 4 6;
+    animation: ring-spin 6s linear infinite;
+    transform-origin: center;
+  }
+  @keyframes ring-spin {
+    to { transform: rotate(360deg); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ring--pending .ring__bg { animation: none; }
   }
   .ring__label {
     position: absolute;
@@ -329,6 +356,30 @@ const C = 2 * Math.PI * R;
     font-size: 26px;
     font-weight: 300;
     transition: transform 0.6s var(--ease-out);
+  }
+  /* When the package cards fill whole rows, run this along the bottom. */
+  .pkg--next.pkg--wide {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: center;
+    gap: 22px;
+    padding: 22px 28px;
+  }
+  .pkg--wide .pkg__plus {
+    flex: none;
+  }
+  .pkg--wide .pkg__next-title {
+    margin: 0;
+    white-space: nowrap;
+  }
+  .pkg--wide .pkg__desc {
+    margin: 0;
+  }
+  @media (max-width: 760px) {
+    .pkg--next.pkg--wide {
+      flex-direction: column;
+      align-items: flex-start;
+    }
   }
   .pkg--next:hover .pkg__plus {
     transform: rotate(90deg);
