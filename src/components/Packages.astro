@@ -1,0 +1,370 @@
+---
+import { loadPackages } from '../data/packages';
+import { profile } from '../data/profile';
+
+const packages = await loadPackages();
+const totals = {
+  count: packages.length,
+  downloads: packages.reduce((n, p) => n + p.downloads, 0),
+  likes: packages.reduce((n, p) => n + p.likes, 0),
+  points: Math.round(packages.reduce((n, p) => n + p.points / p.maxPoints, 0) / packages.length * 100),
+};
+const builtAt = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+const R = 34;
+const C = 2 * Math.PI * R;
+---
+
+<section class="section oss" id="open-source">
+  <div class="wrap">
+    <header class="oss__head">
+      <div>
+        <p class="eyebrow">Open source</p>
+        <h2 class="h2">
+          <span class="split-line"><span>Small packages,</span></span>
+          <span class="split-line"><span><em class="serif">done properly.</em></span></span>
+        </h2>
+      </div>
+      <p class="lede" data-reveal>
+        Things I kept rewriting at work, cleaned up and published. Zero or near-zero dependencies, tested on the oldest
+        and newest Flutter, and maintained.
+      </p>
+    </header>
+
+    <dl class="oss__totals" data-reveal>
+      <div><dt>packages</dt><dd data-count={totals.count}>{totals.count}</dd></div>
+      <div><dt>downloads / 30 days</dt><dd data-count={totals.downloads}>{totals.downloads.toLocaleString()}</dd></div>
+      <div><dt>likes</dt><dd data-count={totals.likes}>{totals.likes}</dd></div>
+      <div><dt>avg. pub score</dt><dd><span data-count={totals.points}>{totals.points}</span>%</dd></div>
+    </dl>
+
+    <div class="oss__grid">
+      {packages.map((p) => {
+        const ratio = p.points / p.maxPoints;
+        return (
+          <article class="pkg" data-spotlight data-tilt data-reveal>
+            <div class="pkg__top">
+              <div>
+                <h3 class="pkg__name mono">{p.name}</h3>
+                <p class="pkg__ver mono">v{p.version} · {p.published}</p>
+              </div>
+              <div class="ring" aria-label={`${p.points} of ${p.maxPoints} pub points`}>
+                <svg viewBox="0 0 80 80">
+                  <circle cx="40" cy="40" r={R} class="ring__bg" />
+                  <circle
+                    cx="40" cy="40" r={R}
+                    class="ring__fg"
+                    stroke-dasharray={C}
+                    stroke-dashoffset={C * (1 - ratio)}
+                    data-ring={C * (1 - ratio)}
+                    data-ring-full={C}
+                  />
+                </svg>
+                <span class="ring__label"><b>{p.points}</b><small>pts</small></span>
+              </div>
+            </div>
+
+            <p class="pkg__desc">{p.description}</p>
+
+            <ul class="pkg__meta mono">
+              <li><span>♥</span> {p.likes} likes</li>
+              <li><span>↓</span> {p.downloads.toLocaleString()} / 30d</li>
+              <li><span>◎</span> {p.platforms.length} platforms</li>
+            </ul>
+
+            <button class="pkg__install mono" data-copy={`flutter pub add ${p.name}`} type="button">
+              <span class="pkg__prompt">$</span> <span class="pkg__cmd">flutter pub add {p.name}</span>
+              <span class="pkg__copy" data-copy-label>copy</span>
+            </button>
+
+            <div class="pkg__links">
+              <a href={`https://pub.dev/packages/${p.name}`} target="_blank" rel="noopener">pub.dev ↗</a>
+              {p.repository && <a href={p.repository} target="_blank" rel="noopener">source ↗</a>}
+            </div>
+          </article>
+        );
+      })}
+
+      <a class="pkg pkg--next" href={profile.links.github} target="_blank" rel="noopener" data-reveal>
+        <span class="pkg__plus" aria-hidden="true">+</span>
+        <p class="pkg__next-title">More on the way</p>
+        <p class="pkg__desc">I publish a new one whenever a problem keeps coming back. Follow along on GitHub.</p>
+      </a>
+    </div>
+
+    <p class="oss__note mono">Live from pub.dev · refreshed every morning · last build {builtAt}</p>
+  </div>
+</section>
+
+<style>
+  .oss {
+    background:
+      radial-gradient(60% 50% at 80% 0%, rgba(43, 127, 255, 0.1), transparent 70%),
+      var(--ink-2);
+    border-block: 1px solid var(--line);
+  }
+  .oss__head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: end;
+  }
+  .oss__totals {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    margin: 64px 0 28px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: rgba(255, 255, 255, 0.015);
+  }
+  .oss__totals div {
+    padding: 22px 24px;
+    border-left: 1px solid var(--line);
+  }
+  .oss__totals div:first-child {
+    border-left: 0;
+  }
+  .oss__totals dt {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .oss__totals dd {
+    margin: 6px 0 0;
+    font-size: clamp(30px, 3.4vw, 44px);
+    font-weight: 650;
+    letter-spacing: -0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+  .oss__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  .pkg {
+    --x: 50%;
+    --y: 50%;
+    min-width: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 28px;
+    border-radius: var(--radius);
+    background: var(--panel);
+    border: 1px solid var(--line);
+    transform-style: preserve-3d;
+    will-change: transform;
+    isolation: isolate;
+  }
+  /* Border that lights up where the cursor is. */
+  .pkg[data-spotlight]::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    z-index: -1;
+    border-radius: inherit;
+    padding: 1px;
+    background: radial-gradient(360px circle at var(--x) var(--y), var(--cyan), transparent 45%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .pkg[data-spotlight]::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    border-radius: inherit;
+    background: radial-gradient(500px circle at var(--x) var(--y), rgba(79, 209, 255, 0.07), transparent 40%);
+    opacity: 0;
+    transition: opacity 0.4s;
+  }
+  .pkg:hover::before,
+  .pkg:hover::after {
+    opacity: 1;
+  }
+  .pkg__top {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+  .pkg__name {
+    margin: 0;
+    font-size: 19px;
+    font-weight: 600;
+    word-break: break-word;
+  }
+  .pkg__ver {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .ring {
+    position: relative;
+    flex: none;
+    width: 72px;
+    height: 72px;
+  }
+  .ring svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+  }
+  .ring circle {
+    fill: none;
+    stroke-width: 6;
+  }
+  .ring__bg {
+    stroke: var(--line-strong);
+  }
+  .ring__fg {
+    stroke: var(--mint);
+    stroke-linecap: round;
+  }
+  .ring__label {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-content: center;
+    text-align: center;
+    line-height: 1;
+  }
+  .ring__label b {
+    font-size: 18px;
+  }
+  .ring__label small {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .pkg__desc {
+    margin: 20px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+    flex: 1;
+  }
+  .pkg__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 22px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 12.5px;
+    color: var(--muted);
+  }
+  .pkg__meta span {
+    color: var(--coral);
+  }
+  .pkg__install {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px 14px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--ink);
+    color: var(--text);
+    font-size: 12.5px;
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.3s;
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .pkg__install:hover {
+    border-color: var(--cyan);
+  }
+  .pkg__prompt {
+    color: var(--cyan);
+  }
+  .pkg__cmd {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .pkg__copy {
+    margin-left: auto;
+    padding-left: 8px;
+    color: var(--muted);
+  }
+  .pkg__install.is-copied .pkg__copy {
+    color: var(--mint);
+  }
+  .pkg__links {
+    display: flex;
+    gap: 18px;
+    margin-top: 18px;
+    font-size: 14px;
+  }
+  .pkg__links a {
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+  .pkg__links a:hover {
+    color: var(--cyan);
+  }
+  .pkg--next {
+    justify-content: center;
+    align-items: flex-start;
+    border-style: dashed;
+    border-color: var(--line-strong);
+    background: transparent;
+    transition: border-color 0.4s, background 0.4s;
+  }
+  .pkg--next:hover {
+    border-color: var(--cyan);
+    background: rgba(79, 209, 255, 0.03);
+  }
+  .pkg__plus {
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    font-size: 26px;
+    font-weight: 300;
+    transition: transform 0.6s var(--ease-out);
+  }
+  .pkg--next:hover .pkg__plus {
+    transform: rotate(90deg);
+  }
+  .pkg__next-title {
+    margin: 20px 0 0;
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .pkg--next .pkg__desc {
+    flex: none;
+    margin-top: 8px;
+  }
+  .oss__note {
+    margin: 28px 0 0;
+    font-size: 12px;
+    color: var(--faint);
+  }
+  @media (max-width: 1000px) {
+    .oss__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width: 760px) {
+    .oss__head,
+    .oss__grid {
+      grid-template-columns: 1fr;
+    }
+    .oss__totals {
+      grid-template-columns: 1fr 1fr;
+    }
+    .oss__totals div:nth-child(3) {
+      border-left: 0;
+    }
+    .oss__totals div:nth-child(n + 3) {
+      border-top: 1px solid var(--line);
+    }
+  }
+</style>

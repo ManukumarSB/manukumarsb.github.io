@@ -1,0 +1,60 @@
+---
+import { stats } from '../data/profile';
+---
+
+<section class="stats wrap" aria-label="At a glance">
+  {stats.map((s) => (
+    <div class="stat" data-reveal>
+      <p class="stat__value">
+        <span data-count={s.value}>{s.value}</span><span class="stat__suffix">{s.suffix}</span>
+      </p>
+      <p class="stat__label">{s.label}</p>
+    </div>
+  ))}
+</section>
+
+<style>
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    margin-top: clamp(80px, 10vw, 140px);
+  }
+  .stat {
+    position: relative;
+    padding: 30px 26px 26px;
+    border-left: 1px solid var(--line);
+  }
+  .stat:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+  .stat__value {
+    margin: 0;
+    font-size: clamp(54px, 7vw, 104px);
+    line-height: 1;
+    font-weight: 700;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+    font-variation-settings: 'wdth' 80;
+  }
+  .stat__suffix {
+    color: var(--cyan);
+  }
+  .stat__label {
+    margin: 12px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 180px;
+  }
+  @media (max-width: 860px) {
+    .stats {
+      grid-template-columns: 1fr 1fr;
+      row-gap: 24px;
+    }
+    .stat:nth-child(3) {
+      border-left: 0;
+      padding-left: 0;
+    }
+  }
+</style>

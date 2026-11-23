@@ -1,0 +1,157 @@
+---
+import { experience } from '../data/profile';
+---
+
+<section class="section" id="work">
+  <div class="wrap exp">
+    <header class="exp__head">
+      <p class="eyebrow">Experience</p>
+      <h2 class="h2">
+        <span class="split-line"><span>Eight years.</span></span>
+        <span class="split-line"><span><em class="serif">Real</em> users.</span></span>
+      </h2>
+      <p class="lede" data-reveal>
+        Political tech and education — apps people open in the field, on bad networks, when it actually matters.
+      </p>
+    </header>
+
+    <ol class="timeline" data-timeline>
+      <span class="timeline__rail" aria-hidden="true"><span class="timeline__fill" data-timeline-fill></span></span>
+      {experience.map((job) => (
+        <li class="job" data-job>
+          <span class="job__node" aria-hidden="true"></span>
+          <p class="job__dates mono">{job.start} — {job.end}</p>
+          <h3 class="job__company">{job.company}</h3>
+          <p class="job__role">
+            {job.role} <span class="job__domain">· {job.domain}</span>
+          </p>
+          <ul class="job__points">
+            {job.points.map((p) => <li>{p}</li>)}
+          </ul>
+          <div class="job__tags">
+            {job.tags.map((t) => <span class="tag">{t}</span>)}
+          </div>
+        </li>
+      ))}
+    </ol>
+  </div>
+</section>
+
+<style>
+  .exp {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(40px, 7vw, 120px);
+    align-items: start;
+  }
+  .exp__head {
+    position: sticky;
+    top: 120px;
+  }
+  .exp__head .lede {
+    margin-top: 26px;
+  }
+  .timeline {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 44px;
+  }
+  .timeline__rail {
+    position: absolute;
+    left: 6px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--line);
+    border-radius: 2px;
+  }
+  .timeline__fill {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(var(--cyan), var(--blue) 70%, var(--coral));
+    transform-origin: top;
+    border-radius: 2px;
+  }
+  :global(.js-motion) .timeline__fill {
+    transform: scaleY(0);
+  }
+  .job {
+    position: relative;
+    padding-bottom: clamp(56px, 7vw, 96px);
+  }
+  .job:last-child {
+    padding-bottom: 0;
+  }
+  .job__node {
+    position: absolute;
+    left: -44px;
+    top: 4px;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--ink);
+    border: 2px solid var(--faint);
+    transition: border-color 0.4s, box-shadow 0.4s, background 0.4s;
+  }
+  .job.is-lit .job__node,
+  :global(html:not(.js-motion)) .job__node {
+    border-color: var(--cyan);
+    background: var(--cyan);
+    box-shadow: 0 0 0 6px rgba(79, 209, 255, 0.15), 0 0 24px var(--cyan);
+  }
+  .job__dates {
+    margin: 0;
+    font-size: 13px;
+    color: var(--cyan);
+  }
+  .job__company {
+    margin: 10px 0 4px;
+    font-size: clamp(28px, 3.4vw, 44px);
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 650;
+  }
+  .job__role {
+    margin: 0;
+    font-weight: 500;
+  }
+  .job__domain {
+    color: var(--muted);
+    font-weight: 400;
+  }
+  .job__points {
+    margin: 22px 0 0;
+    padding: 0;
+    list-style: none;
+    color: var(--muted);
+  }
+  .job__points li {
+    position: relative;
+    padding-left: 22px;
+    margin-bottom: 12px;
+  }
+  .job__points li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.75em;
+    width: 10px;
+    height: 1px;
+    background: var(--faint);
+  }
+  .job__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  @media (max-width: 900px) {
+    .exp {
+      grid-template-columns: 1fr;
+    }
+    .exp__head {
+      position: static;
+    }
+  }
+</style>

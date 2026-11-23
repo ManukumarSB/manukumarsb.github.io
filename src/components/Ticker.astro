@@ -1,0 +1,81 @@
+---
+import { ticker } from '../data/profile';
+const half = Math.ceil(ticker.length / 2);
+const rows = [ticker, [...ticker.slice(half), ...ticker.slice(0, half)]];
+---
+
+<div class="ticker" aria-label="Technologies I work with">
+  {rows.map((row, i) => (
+    <div class={`ticker__row ${i ? 'is-reverse' : ''}`} aria-hidden={i ? 'true' : undefined}>
+      <div class="ticker__track">
+        {[0, 1].map((copy) => (
+          <span class="ticker__set" aria-hidden={copy ? 'true' : undefined}>
+            {row.map((t) => (
+              <span class="ticker__item">
+                {t}
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 7.6H22l-6.2 4.6 2.4 7.6L12 17.2l-6.2 4.6 2.4-7.6L2 9.6h7.6z" /></svg>
+              </span>
+            ))}
+          </span>
+        ))}
+      </div>
+    </div>
+  ))}
+</div>
+
+<style>
+  .ticker {
+    position: relative;
+    padding: 28px 0;
+    border-block: 1px solid var(--line);
+    overflow: hidden;
+    transform: rotate(-1.5deg) scale(1.03);
+    background: var(--ink-2);
+  }
+  .ticker__row + .ticker__row {
+    margin-top: 10px;
+  }
+  .ticker__track {
+    display: flex;
+    width: max-content;
+    animation: tick 48s linear infinite;
+  }
+  .is-reverse .ticker__track {
+    animation-direction: reverse;
+    animation-duration: 56s;
+  }
+  .ticker:hover .ticker__track {
+    animation-play-state: paused;
+  }
+  .ticker__set {
+    display: flex;
+  }
+  .ticker__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 28px;
+    padding-right: 28px;
+    font-size: clamp(26px, 3.6vw, 46px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    white-space: nowrap;
+  }
+  .is-reverse .ticker__item {
+    color: transparent;
+    -webkit-text-stroke: 1px var(--faint);
+  }
+  .ticker__item svg {
+    width: 0.5em;
+    height: 0.5em;
+    fill: var(--coral);
+  }
+  .is-reverse .ticker__item svg {
+    fill: var(--cyan);
+  }
+  @keyframes tick {
+    to { transform: translateX(-50%); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticker__track { animation: none; }
+  }
+</style>
