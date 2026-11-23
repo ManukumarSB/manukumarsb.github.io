@@ -1,0 +1,78 @@
+---
+// A two-second "flutter run" before the page appears. Only on the first
+// visit per session, and never when reduced motion is on.
+---
+
+<div class="loader" aria-hidden="true">
+  <div class="loader__term mono">
+    <p><span class="p">$</span> flutter run -d manukumarsb.github.io</p>
+    <p class="dim">Launching lib/main.dart in release mode…</p>
+    <p class="dim">Compiling portfolio <span class="bar"><i></i></span></p>
+    <p class="ok">✓ Built in <span class="ms">0</span>ms</p>
+    <p class="hot">⚡ Hot reload</p>
+  </div>
+  <div class="loader__wipe"></div>
+</div>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: none;
+    place-items: center;
+    background: var(--ink);
+  }
+  :global(.show-loader) .loader {
+    display: grid;
+  }
+  .loader__term {
+    width: min(560px, calc(100vw - 32px));
+    font-size: clamp(13px, 1.6vw, 15px);
+    line-height: 2;
+    color: var(--text);
+  }
+  .loader__term p {
+    margin: 0;
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .p {
+    color: var(--cyan);
+    margin-right: 6px;
+  }
+  .dim {
+    color: var(--muted);
+  }
+  .ok {
+    color: var(--mint);
+  }
+  .hot {
+    color: #ffd25e;
+  }
+  .bar {
+    display: inline-block;
+    vertical-align: middle;
+    width: 140px;
+    height: 4px;
+    margin-left: 8px;
+    border-radius: 2px;
+    background: var(--line-strong);
+    overflow: hidden;
+  }
+  .bar i {
+    display: block;
+    height: 100%;
+    width: 100%;
+    background: var(--cyan);
+    transform-origin: left;
+    transform: scaleX(0);
+  }
+  .loader__wipe {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, var(--cyan), var(--blue));
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+</style>

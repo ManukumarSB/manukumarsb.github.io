@@ -1,0 +1,327 @@
+---
+// A looping, hand-built recreation of my keyboard_dock package in action.
+// The timeline lives in scripts/phone.ts.
+const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+---
+
+<div class="demo">
+  <div class="phone" data-phone>
+    <div class="phone__screen">
+      <div class="status mono">
+        <span>9:41</span>
+        <span class="island"></span>
+        <span class="bat"><i></i></span>
+      </div>
+
+      <div class="app">
+        <p class="app__back">‹ Back</p>
+        <p class="app__title">Create account</p>
+        <p class="app__sub">It only takes a minute.</p>
+
+        <label class="field" data-field="0">
+          <span class="field__label">Name</span>
+          <span class="field__value"><span data-type></span><i class="caret"></i></span>
+        </label>
+        <label class="field" data-field="1">
+          <span class="field__label">Email</span>
+          <span class="field__value"><span data-type></span><i class="caret"></i></span>
+        </label>
+        <label class="field">
+          <span class="field__label">City</span>
+          <span class="field__value"></span>
+        </label>
+      </div>
+
+      <div class="dock" data-dock>
+        <span class="dock__btn" data-dock-btn>Continue</span>
+      </div>
+
+      <div class="kb" data-kb aria-hidden="true">
+        {rows.map((r, i) => (
+          <div class={`kb__row kb__row--${i}`}>
+            {i === 2 && <span class="key key--wide">⇧</span>}
+            {[...r].map((k) => <span class="key" data-key={k}>{k}</span>)}
+            {i === 2 && <span class="key key--wide">⌫</span>}
+          </div>
+        ))}
+        <div class="kb__row">
+          <span class="key key--wide">123</span>
+          <span class="key key--space" data-key=" ">space</span>
+          <span class="key key--wide key--go">next</span>
+        </div>
+      </div>
+
+      <div class="home"></div>
+      <div class="toast" data-toast>✓ Account created</div>
+    </div>
+  </div>
+
+  <span class="chip chip--a mono" data-float="18">160 / 160 pub points</span>
+  <span class="chip chip--b mono" data-float="-24">0 dependencies</span>
+  <span class="chip chip--c mono" data-float="12">99%+ crash-free</span>
+
+  <a class="demo__caption mono" href="https://pub.dev/packages/keyboard_dock" target="_blank" rel="noopener">
+    <span class="pulse"></span> keyboard_dock — my package, running live
+  </a>
+</div>
+
+<style>
+  .demo {
+    position: relative;
+    perspective: 1400px;
+    padding: 20px 0 48px;
+  }
+  .phone {
+    position: relative;
+    width: 300px;
+    height: 620px;
+    padding: 11px;
+    border-radius: 52px;
+    background: linear-gradient(145deg, #2a3242, #0d1118 40%, #1b2230);
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08) inset,
+      0 50px 100px -20px rgba(0, 0, 0, 0.8),
+      0 30px 60px -30px rgba(43, 127, 255, 0.5);
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+  .phone__screen {
+    position: relative;
+    height: 100%;
+    border-radius: 42px;
+    overflow: hidden;
+    background: #f7f8fc;
+    color: #111725;
+    font-size: 13px;
+  }
+  .status {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 46px;
+    padding: 0 26px;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .island {
+    width: 92px;
+    height: 26px;
+    border-radius: 20px;
+    background: #000;
+  }
+  .bat {
+    width: 22px;
+    height: 11px;
+    border: 1.5px solid #111725;
+    border-radius: 3px;
+    padding: 1px;
+  }
+  .bat i {
+    display: block;
+    width: 80%;
+    height: 100%;
+    background: #111725;
+    border-radius: 1px;
+  }
+  .app {
+    padding: 6px 20px;
+  }
+  .app__back {
+    margin: 0;
+    color: #4a5bd6;
+    font-weight: 600;
+  }
+  .app__title {
+    margin: 14px 0 2px;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .app__sub {
+    margin: 0 0 18px;
+    color: #6a7387;
+  }
+  .field {
+    display: block;
+    margin-bottom: 11px;
+    padding: 9px 13px;
+    border: 1.5px solid #d5d9e4;
+    border-radius: 12px;
+    background: #fff;
+    transition: border-color 0.25s, box-shadow 0.25s;
+  }
+  .field.is-focus {
+    border-color: #4a5bd6;
+    box-shadow: 0 0 0 4px rgba(74, 91, 214, 0.12);
+  }
+  .field__label {
+    display: block;
+    font-size: 10.5px;
+    color: #7c8598;
+  }
+  .field__value {
+    display: block;
+    min-height: 19px;
+    font-weight: 500;
+  }
+  .caret {
+    display: none;
+    width: 1.5px;
+    height: 15px;
+    margin-left: 1px;
+    vertical-align: -2px;
+    background: #4a5bd6;
+    animation: blink 1s steps(1) infinite;
+  }
+  .field.is-focus .caret {
+    display: inline-block;
+  }
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+  .dock {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    padding: 12px 16px 34px;
+    background: #f7f8fc;
+    border-top: 1px solid #e3e6ee;
+    will-change: transform;
+  }
+  .dock__btn {
+    display: block;
+    padding: 13px;
+    border-radius: 14px;
+    background: #4a5bd6;
+    color: #fff;
+    text-align: center;
+    font-weight: 600;
+  }
+  .kb {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 3;
+    height: 238px;
+    padding: 9px 3px 40px;
+    background: #d2d5dd;
+    transform: translateY(100%);
+    will-change: transform;
+  }
+  .kb__row {
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    margin-bottom: 9px;
+  }
+  .key {
+    display: grid;
+    place-items: center;
+    flex: 0 0 24px;
+    height: 36px;
+    border-radius: 6px;
+    background: #fff;
+    box-shadow: 0 1px 0 #8f939c;
+    font-size: 15px;
+    transition: background 0.1s, transform 0.1s;
+  }
+  .key.is-down {
+    background: #b6bac4;
+    transform: translateY(1px);
+  }
+  .key--wide {
+    flex-basis: 36px;
+    background: #adb2bd;
+    font-size: 12px;
+  }
+  .key--space {
+    flex: 1;
+    max-width: 150px;
+    font-size: 12px;
+  }
+  .key--go {
+    flex-basis: 64px;
+  }
+  .home {
+    position: absolute;
+    bottom: 8px;
+    left: 50%;
+    z-index: 4;
+    width: 110px;
+    height: 4px;
+    margin-left: -55px;
+    border-radius: 3px;
+    background: #111725;
+  }
+  .toast {
+    position: absolute;
+    top: 56px;
+    left: 50%;
+    z-index: 5;
+    padding: 9px 16px;
+    border-radius: 999px;
+    background: #111725;
+    color: #fff;
+    font-weight: 600;
+    white-space: nowrap;
+    transform: translate(-50%, -80px);
+  }
+  .chip {
+    position: absolute;
+    z-index: 2;
+    padding: 9px 14px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: rgba(15, 21, 32, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    font-size: 12px;
+    color: var(--text);
+    white-space: nowrap;
+    box-shadow: 0 20px 40px -20px rgba(0, 0, 0, 0.8);
+  }
+  .chip--a { top: 80px; left: -70px; }
+  .chip--b { top: 300px; right: -60px; color: var(--cyan); }
+  .chip--c { bottom: 120px; left: -50px; color: var(--mint); }
+  .demo__caption {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transform: translateX(-50%);
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+    transition: color 0.3s;
+  }
+  .demo__caption:hover {
+    color: var(--cyan);
+  }
+  .pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--cyan);
+    animation: pulse-c 1.6s infinite;
+  }
+  @keyframes pulse-c {
+    50% { opacity: 0.3; }
+  }
+  @media (max-width: 1100px) {
+    .chip--a { left: -30px; }
+    .chip--b { right: -30px; }
+    .chip--c { left: -20px; }
+  }
+  @media (max-width: 420px) {
+    .phone {
+      transform: scale(0.88);
+      margin: -36px 0;
+    }
+    .chip { display: none; }
+  }
+</style>

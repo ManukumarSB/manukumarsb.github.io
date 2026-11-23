@@ -1,0 +1,135 @@
+---
+import { profile } from '../data/profile';
+
+const items = [
+  { href: '#work', label: 'Work' },
+  { href: '#open-source', label: 'Open source' },
+  { href: '#projects', label: 'Projects' },
+  { href: '#about', label: 'About' },
+];
+---
+
+<header class="nav">
+  <a href="#top" class="nav__logo" aria-label={`${profile.name}, back to top`}>
+    <span class="nav__mark">M</span>
+    <span class="nav__name">{profile.name}</span>
+  </a>
+
+  <nav class="nav__pill" aria-label="Sections">
+    <span class="nav__indicator" aria-hidden="true"></span>
+    {items.map((i) => <a href={i.href} data-nav>{i.label}</a>)}
+  </nav>
+
+  <a href="#contact" class="nav__cta" data-magnetic>
+    <span class="dot"></span> Let’s talk
+  </a>
+</header>
+
+<style>
+  .nav {
+    position: fixed;
+    top: 16px;
+    left: 0;
+    right: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 0 var(--gutter);
+    pointer-events: none;
+    transition: transform 0.5s var(--ease-out);
+  }
+  .nav.is-hidden {
+    transform: translateY(-120%);
+  }
+  .nav > * {
+    pointer-events: auto;
+  }
+  .nav__logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 600;
+  }
+  .nav__mark {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--cyan), var(--blue));
+    color: var(--ink);
+    font-weight: 800;
+    font-size: 19px;
+    transition: transform 0.6s var(--ease-out);
+  }
+  .nav__logo:hover .nav__mark {
+    transform: rotate(-12deg) scale(1.06);
+  }
+  .nav__name {
+    font-size: 15px;
+  }
+  .nav__pill {
+    position: relative;
+    display: flex;
+    padding: 5px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: rgba(11, 15, 23, 0.6);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  }
+  .nav__pill a {
+    position: relative;
+    z-index: 1;
+    padding: 8px 16px;
+    font-size: 14px;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+  .nav__pill a:hover,
+  .nav__pill a.is-active {
+    color: var(--text);
+  }
+  .nav__indicator {
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 0;
+    width: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    opacity: 0;
+    transition: transform 0.5s var(--ease-out), width 0.5s var(--ease-out), opacity 0.3s;
+  }
+  .nav__cta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 11px 18px;
+    border-radius: 999px;
+    background: var(--text);
+    color: var(--ink);
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 0 0 rgba(62, 224, 161, 0.6);
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    70% { box-shadow: 0 0 0 8px rgba(62, 224, 161, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(62, 224, 161, 0); }
+  }
+  @media (max-width: 860px) {
+    .nav__pill,
+    .nav__name {
+      display: none;
+    }
+  }
+</style>
