@@ -123,6 +123,15 @@ export const projects: Project[] = [
     accent: '#FFB547',
   },
   {
+    title: 'GoKalpa',
+    kind: 'Personal · Live product',
+    blurb:
+      'From farmer to farmer — a marketplace where farmers across India buy and sell cattle for dairy, farming and breeding. Built end to end in Flutter.',
+    tags: ['Flutter', 'Flutter Web', 'Marketplace'],
+    url: 'https://gokalpa.in/',
+    accent: '#F5B841',
+  },
+  {
     title: 'My Event',
     kind: 'Personal · Web + iOS & Android',
     blurb:
