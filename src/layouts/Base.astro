@@ -1,0 +1,123 @@
+---
+import '../styles/global.css';
+import { profile } from '../data/profile';
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${profile.name} — Flutter engineer`,
+  description = `${profile.role} building Flutter apps for iOS and Android. 8+ years, open-source packages on pub.dev.`,
+} = Astro.props;
+
+const site = Astro.site?.toString() ?? '/';
+const image = new URL('/og.png', Astro.site ?? 'https://manukumarsb.github.io').toString();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: profile.fullName,
+  alternateName: profile.name,
+  jobTitle: profile.role,
+  url: site,
+  image: new URL(profile.photo, Astro.site ?? site).toString(),
+  sameAs: [profile.links.github, profile.links.linkedin],
+  address: { '@type': 'PostalAddress', addressLocality: 'Irvine', addressRegion: 'CA' },
+  knowsAbout: ['Flutter', 'Dart', 'iOS', 'Android', 'Mobile architecture'],
+};
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#06080d" />
+    <link rel="canonical" href={site} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={site} />
+    <meta property="og:image" content={image} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+    <!-- Decide before first paint whether things should animate in, so
+         content never flashes visible-then-hidden. -->
+    <script is:inline>
+      if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        var c = document.documentElement.classList;
+        c.add('js-motion');
+        try {
+          if (!sessionStorage.getItem('loader-seen')) c.add('show-loader');
+        } catch (e) {}
+      }
+    </script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <slot />
+    <div class="cursor" aria-hidden="true"><span></span></div>
+    <script>
+      import '../scripts/main.ts';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  .skip {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 200;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--cyan);
+    color: var(--ink);
+    font-weight: 600;
+    transform: translateY(-200%);
+  }
+  .skip:focus {
+    transform: none;
+  }
+
+  .cursor {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 150;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+    display: none;
+  }
+  .cursor span {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border: 1px solid rgba(233, 238, 247, 0.5);
+    border-radius: 50%;
+    transition: width 0.35s var(--ease-out), height 0.35s var(--ease-out),
+      margin 0.35s var(--ease-out), background 0.35s, border-color 0.35s;
+  }
+  .cursor.is-hover span {
+    width: 72px;
+    height: 72px;
+    margin: -36px 0 0 -36px;
+    background: rgba(79, 209, 255, 0.12);
+    border-color: var(--cyan);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .js-motion .cursor {
+      display: block;
+    }
+  }
+</style>
