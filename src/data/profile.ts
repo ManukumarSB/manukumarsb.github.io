@@ -7,7 +7,7 @@ export const profile = {
   role: 'Senior Software Engineer',
   focus: ['Flutter', 'iOS', 'Android'],
   location: 'Irvine, California',
-  email: 'manu.sb71@gmail.com',
+  email: 'manubalarama@gmail.com',
   photo: '/me.jpg',
   intro:
     "I've spent 8+ years shipping Flutter apps to real people in the field — canvassers walking turf, kids learning to count, teams who need the app to just work. I care about the boring parts too: crash-free sessions, clean releases, and code the next person can read.",
@@ -157,6 +157,15 @@ export const projects: Project[] = [
     accent: '#2B7FFF',
   },
   {
+    title: 'Park Assist',
+    kind: 'Experiment · Android · Wi-Fi Aware',
+    blurb:
+      'Find a free parking slot with no internet. The lot publishes its slots over Wi-Fi Aware (NAN), nearby phones discover it directly, see a live grid and claim a spot — peer to peer, no router.',
+    tags: ['Android', 'Java', 'Wi-Fi Aware', 'Peer-to-peer'],
+    url: 'https://github.com/ManukumarSB/Parking_with_NAN',
+    accent: '#22D3EE',
+  },
+  {
     title: 'Gen AI PDF Chat',
     kind: 'Side project',
     blurb: 'Upload a PDF, ask it questions. A playground for running different AI providers from a Flutter app.',
@@ -194,6 +203,26 @@ export const offline = [
   { title: 'Pacific Northwest', text: 'Trails, rain, and the best coffee stops between Portland and Seattle.' },
   { title: 'Tech & travel vlog', text: 'Filming the places I go and the things I build.' },
 ];
+
+// The AI chat (hosted on Honestify), embedded on the site.
+export const chat = {
+  url: 'https://www.honestify.me/manu',
+  // Shown as a replayed sample conversation. Keep these factual.
+  samples: [
+    {
+      q: "What's your current role?",
+      a: 'Senior Software Engineer at Political Data Intelligence. I own three production Flutter apps end to end.',
+    },
+    {
+      q: 'Biggest thing you have built?',
+      a: 'OutreachCircle, from the first commit, plus 20+ white-label apps from the same codebase — all shipped to both stores.',
+    },
+    {
+      q: 'Favourite part of the stack?',
+      a: 'Clean architecture with BLoC or Riverpod, and the release pipeline. I like apps that never crash.',
+    },
+  ],
+};
 
 export const nowLearning = 'On-device AI and edge RAG in Flutter, and more Next.js on the web side.';
 
