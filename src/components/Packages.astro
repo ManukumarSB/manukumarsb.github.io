@@ -99,7 +99,7 @@ const C = 2 * Math.PI * R;
       })}
 
       <a
-        class:list={['pkg', 'pkg--next', { 'pkg--wide': packages.length % 3 === 0 }]}
+        class:list={['pkg', 'pkg--next', { 'pkg--wide': packages.length % 3 === 0, 'pkg--fill': packages.length % 3 === 1 }]}
         href={profile.links.github} target="_blank" rel="noopener" data-reveal>
         <span class="pkg__plus" aria-hidden="true">+</span>
         <p class="pkg__next-title">More on the way</p>
@@ -364,6 +364,15 @@ const C = 2 * Math.PI * R;
     align-items: center;
     gap: 22px;
     padding: 22px 28px;
+  }
+  /* One package alone on the last row: take the two empty columns. */
+  .pkg--next.pkg--fill {
+    grid-column: span 2;
+  }
+  @media (max-width: 1000px) {
+    .pkg--next.pkg--fill {
+      grid-column: auto;
+    }
   }
   .pkg--wide .pkg__plus {
     flex: none;

@@ -30,6 +30,19 @@ const fallback: Record<string, PubPackage> = {
     platforms: ['android', 'ios', 'web', 'macos', 'windows', 'linux'],
     repository: 'https://github.com/ManukumarSB/keyboard_doc',
   },
+  per_app_language: {
+    name: 'per_app_language',
+    version: '0.1.0',
+    description:
+      "Let users pick your app's language in Android 13+ and iOS system settings, and keep Flutter in sync. Includes a setup command for the native config.",
+    published: '2026-11-24',
+    likes: 0,
+    downloads: 0,
+    points: 160,
+    maxPoints: 160,
+    platforms: ['android', 'ios'],
+    repository: 'https://github.com/ManukumarSB/per_app_language',
+  },
   preloaded_page_view: {
     name: 'preloaded_page_view',
     version: '0.1.0',
