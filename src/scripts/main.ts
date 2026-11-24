@@ -88,6 +88,11 @@ function setupSmoothScroll() {
   gsap.ticker.add((t) => lenis!.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
 
+  // The chat dialog scrolls inside an iframe; keep the page still meanwhile.
+  window.addEventListener('chat:toggle', (e) => {
+    (e as CustomEvent<boolean>).detail ? lenis!.stop() : lenis!.start();
+  });
+
   $$<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
     a.addEventListener('click', (e) => {
       const target = a.hash.length > 1 ? $(a.hash) : null;

@@ -33,6 +33,7 @@ const word = 'pickleball.';
         <button class="contact__copy mono" type="button" data-copy={profile.email}>
           {profile.email} <span data-copy-label>copy</span>
         </button>
+        <button class="contact__ai mono" type="button" data-chat-open>or ask my AI →</button>
       </div>
     </div>
   </div>
@@ -144,6 +145,17 @@ const word = 'pickleball.';
   .contact__copy:hover {
     border-color: var(--cyan);
     color: var(--text);
+  }
+  .contact__ai {
+    border: 0;
+    background: none;
+    color: var(--cyan);
+    font-size: 12.5px;
+    cursor: pointer;
+  }
+  .contact__ai:hover {
+    text-decoration: underline;
+    text-underline-offset: 4px;
   }
   .contact__copy.is-copied span {
     color: var(--mint);

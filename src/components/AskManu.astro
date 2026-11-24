@@ -1,0 +1,651 @@
+---
+import { profile, chat } from '../data/profile';
+---
+
+<section class="section ask" id="ask">
+  <div class="wrap ask__grid">
+    <div>
+      <p class="eyebrow">Ask me anything</p>
+      <h2 class="h2">
+        <span class="split-line"><span>Skip the reading.</span></span>
+        <span class="split-line"><span><em class="serif">Just ask.</em></span></span>
+      </h2>
+      <p class="lede" data-reveal>
+        This chat knows my resume, the apps I've shipped and the stack I work with. It only talks about me, so ask
+        it what you'd ask me over coffee.
+      </p>
+      <div class="ask__actions" data-reveal>
+        <button class="btn btn--primary" type="button" data-chat-open data-magnetic>
+          <span class="ask__spark" aria-hidden="true"></span> Start chatting
+        </button>
+        <a class="btn" href={chat.url} target="_blank" rel="noopener" data-magnetic>
+          Open in new tab
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17 17 7M8 7h9v9" /></svg>
+        </a>
+      </div>
+    </div>
+
+    <!-- A replayed sample conversation so visitors see what to expect. -->
+    <div class="preview" data-reveal data-chat-preview aria-hidden="true">
+      <div class="preview__bar">
+        <img src={profile.photo} alt="" width="32" height="32" />
+        <div>
+          <p class="preview__name">{profile.shortName} <span class="preview__badge mono">AI</span></p>
+          <p class="preview__status mono"><span class="dot"></span> online</p>
+        </div>
+      </div>
+      <div class="preview__body">
+        {chat.samples.map((s) => (
+          <div class="turn" data-turn>
+            <p class="bubble bubble--q">{s.q}</p>
+            <p class="bubble bubble--a" data-answer={s.a}><span class="typing"><i></i><i></i><i></i></span></p>
+          </div>
+        ))}
+      </div>
+      <button class="preview__cta mono" type="button" data-chat-open tabindex="-1">Ask your own question →</button>
+    </div>
+  </div>
+</section>
+
+<button class="launcher" type="button" data-chat-open aria-haspopup="dialog" aria-controls="chat-dialog">
+  <span class="launcher__avatar">
+    <img src={profile.photo} alt="" width="44" height="44" />
+    <span class="launcher__online" aria-hidden="true"></span>
+  </span>
+  <span class="launcher__text">
+    <span class="launcher__title">Chat with me</span>
+    <span class="launcher__sub mono">AI · knows my resume</span>
+  </span>
+</button>
+
+<div class="nudge" role="status" data-chat-nudge hidden>
+  <p>Hi, I'm Manu. Want the short version? Ask my AI anything about my work.</p>
+  <button type="button" class="nudge__close" aria-label="Dismiss" data-nudge-close>×</button>
+</div>
+
+<dialog class="chat" id="chat-dialog" aria-labelledby="chat-title">
+  <div class="chat__card">
+    <header class="chat__head">
+      <img src={profile.photo} alt="" width="38" height="38" />
+      <div class="chat__who">
+        <p class="chat__title" id="chat-title">Ask {profile.shortName}</p>
+        <p class="chat__sub mono"><span class="dot"></span> AI trained on my resume · answers about me only</p>
+      </div>
+      <a class="chat__icon" href={chat.url} target="_blank" rel="noopener" aria-label="Open chat in a new tab">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-8 8M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" /></svg>
+      </a>
+      <button class="chat__icon" type="button" aria-label="Close chat" data-chat-close>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6 6 18" /></svg>
+      </button>
+    </header>
+    <div class="chat__frame">
+      <div class="chat__loading" data-chat-loading>
+        <span class="typing"><i></i><i></i><i></i></span>
+        <p class="mono">Waking up the assistant…</p>
+      </div>
+      <!-- src is set on first open so the page doesn't pay for it up front. -->
+      <iframe
+        title={`Chat with ${profile.shortName}'s AI assistant`}
+        data-src={chat.url}
+        allow="clipboard-write"
+        referrerpolicy="strict-origin-when-cross-origin"
+        data-chat-frame
+      ></iframe>
+    </div>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#chat-dialog')!;
+  const frame = document.querySelector<HTMLIFrameElement>('[data-chat-frame]')!;
+  const loading = document.querySelector<HTMLElement>('[data-chat-loading]')!;
+  const launcher = document.querySelector<HTMLElement>('.launcher')!;
+  const nudge = document.querySelector<HTMLElement>('[data-chat-nudge]')!;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let opener: HTMLElement | null = null;
+
+  frame.addEventListener('load', () => loading.classList.add('is-done'), { once: true });
+
+  function open(from?: HTMLElement) {
+    if (dialog.open) return;
+    opener = from ?? null;
+    if (!frame.src) frame.src = frame.dataset.src!;
+    hideNudge(true);
+    dialog.showModal();
+    document.documentElement.classList.add('chat-open');
+    window.dispatchEvent(new CustomEvent('chat:toggle', { detail: true }));
+  }
+
+  function close() {
+    if (!dialog.open || dialog.classList.contains('is-closing')) return;
+    const finish = () => {
+      dialog.classList.remove('is-closing');
+      dialog.close();
+    };
+    if (reduced) return finish();
+    dialog.classList.add('is-closing');
+    dialog.addEventListener('animationend', finish, { once: true });
+  }
+
+  dialog.addEventListener('close', () => {
+    document.documentElement.classList.remove('chat-open');
+    window.dispatchEvent(new CustomEvent('chat:toggle', { detail: false }));
+    (opener ?? launcher).focus();
+  });
+
+  // Esc: animate out instead of the instant native close.
+  dialog.addEventListener('cancel', (e) => {
+    e.preventDefault();
+    close();
+  });
+
+  // Click on the backdrop (outside the card) closes.
+  dialog.addEventListener('click', (e) => {
+    if (e.target === dialog) close();
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-chat-open]').forEach((el) =>
+    el.addEventListener('click', () => open(el)),
+  );
+  document.querySelectorAll<HTMLElement>('[data-chat-close]').forEach((el) =>
+    el.addEventListener('click', close),
+  );
+
+  // A one-time nudge after a visitor has been reading for a bit.
+  function hideNudge(remember: boolean) {
+    nudge.classList.remove('is-shown');
+    if (remember) {
+      try {
+        sessionStorage.setItem('chat-nudged', '1');
+      } catch {}
+    }
+  }
+  document.querySelector('[data-nudge-close]')!.addEventListener('click', () => hideNudge(true));
+  let nudged = false;
+  try {
+    nudged = !!sessionStorage.getItem('chat-nudged');
+  } catch {}
+  if (!nudged) {
+    setTimeout(() => {
+      if (dialog.open) return;
+      nudge.hidden = false;
+      requestAnimationFrame(() => nudge.classList.add('is-shown'));
+      setTimeout(() => hideNudge(true), 9000);
+    }, 14000);
+  }
+
+  // Sample conversation: type answers in as the preview scrolls into view.
+  const preview = document.querySelector<HTMLElement>('[data-chat-preview]');
+  if (preview) {
+    const turns = [...preview.querySelectorAll<HTMLElement>('[data-turn]')];
+    const play = async () => {
+      for (const turn of turns) {
+        const answer = turn.querySelector<HTMLElement>('[data-answer]')!;
+        turn.classList.add('is-in');
+        if (reduced) {
+          answer.textContent = answer.dataset.answer!;
+          continue;
+        }
+        await wait(900);
+        const text = answer.dataset.answer!;
+        answer.textContent = '';
+        for (let i = 1; i <= text.length; i++) {
+          answer.textContent = text.slice(0, i);
+          await wait(12 + Math.random() * 18);
+        }
+        await wait(500);
+      }
+    };
+    new IntersectionObserver((entries, obs) => {
+      if (entries.some((e) => e.isIntersecting)) {
+        obs.disconnect();
+        play();
+      }
+    }, { threshold: 0.4 }).observe(preview);
+  }
+
+  function wait(ms: number) {
+    return new Promise((r) => setTimeout(r, ms));
+  }
+</script>
+
+<style>
+  .ask__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 6vw, 96px);
+    align-items: center;
+  }
+  .ask .lede {
+    margin-top: 26px;
+  }
+  .ask__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+  .ask__spark {
+    width: 16px;
+    height: 16px;
+    background: currentColor;
+    clip-path: polygon(50% 0, 62% 38%, 100% 50%, 62% 62%, 50% 100%, 38% 62%, 0 50%, 38% 38%);
+  }
+
+  /* --- sample conversation --- */
+  .preview {
+    position: relative;
+    border-radius: 28px;
+    border: 1px solid var(--line);
+    background:
+      radial-gradient(80% 60% at 100% 0%, rgba(79, 209, 255, 0.1), transparent 60%),
+      var(--panel);
+    box-shadow: 0 40px 80px -40px rgba(0, 0, 0, 0.8);
+    overflow: hidden;
+  }
+  .preview__bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--line);
+  }
+  .preview__bar img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .preview__name {
+    margin: 0;
+    font-weight: 600;
+  }
+  .preview__badge {
+    margin-left: 6px;
+    padding: 2px 7px;
+    border-radius: 6px;
+    background: rgba(79, 209, 255, 0.14);
+    color: var(--cyan);
+    font-size: 11px;
+  }
+  .preview__status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 2px 0 0;
+    font-size: 11.5px;
+    color: var(--muted);
+  }
+  .preview__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    min-height: 330px;
+    padding: 24px 22px 8px;
+  }
+  .turn {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    opacity: 0;
+    transform: translateY(14px);
+    transition: opacity 0.5s var(--ease-out), transform 0.5s var(--ease-out);
+  }
+  .turn.is-in,
+  :global(html:not(.js-motion)) .turn {
+    opacity: 1;
+    transform: none;
+  }
+  .bubble {
+    max-width: 82%;
+    margin: 0;
+    padding: 11px 15px;
+    border-radius: 18px;
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .bubble--q {
+    align-self: flex-end;
+    background: var(--cyan);
+    color: var(--ink);
+    border-bottom-right-radius: 6px;
+    font-weight: 500;
+  }
+  .bubble--a {
+    align-self: flex-start;
+    min-height: 42px;
+    background: var(--panel-2);
+    border: 1px solid var(--line);
+    border-bottom-left-radius: 6px;
+  }
+  .preview__cta {
+    display: block;
+    width: calc(100% - 44px);
+    margin: 12px 22px 22px;
+    padding: 14px;
+    border: 1px dashed var(--line-strong);
+    border-radius: 14px;
+    background: transparent;
+    color: var(--muted);
+    font-size: 13px;
+    cursor: pointer;
+    transition: border-color 0.3s, color 0.3s;
+  }
+  .preview__cta:hover {
+    border-color: var(--cyan);
+    color: var(--text);
+  }
+  .typing {
+    display: inline-flex;
+    gap: 4px;
+  }
+  .typing i {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--muted);
+    animation: blink-dot 1.2s infinite;
+  }
+  .typing i:nth-child(2) { animation-delay: 0.15s; }
+  .typing i:nth-child(3) { animation-delay: 0.3s; }
+  @keyframes blink-dot {
+    0%, 60%, 100% { opacity: 0.25; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-3px); }
+  }
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--mint);
+    box-shadow: 0 0 8px var(--mint);
+  }
+
+  /* --- floating launcher --- */
+  .launcher {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 95;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 7px 18px 7px 7px;
+    border: 1px solid var(--line-strong);
+    border-radius: 999px;
+    background: rgba(15, 21, 32, 0.82);
+    backdrop-filter: blur(18px) saturate(1.4);
+    -webkit-backdrop-filter: blur(18px) saturate(1.4);
+    color: var(--text);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+    box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.9), 0 0 0 0 rgba(79, 209, 255, 0.4);
+    animation: launcher-in 0.8s 1.2s var(--ease-out) both, launcher-glow 3.2s 3s infinite;
+    transition: transform 0.4s var(--ease-out), border-color 0.3s;
+  }
+  .launcher:hover {
+    transform: translateY(-3px);
+    border-color: var(--cyan);
+  }
+  :global(html.chat-open) .launcher {
+    opacity: 0;
+    pointer-events: none;
+  }
+  .launcher__avatar {
+    position: relative;
+    flex: none;
+  }
+  .launcher__avatar img {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .launcher__online {
+    position: absolute;
+    right: 0;
+    bottom: 1px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--mint);
+    border: 2px solid var(--panel);
+  }
+  .launcher__text {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+  }
+  .launcher__title {
+    font-weight: 600;
+    font-size: 15px;
+  }
+  .launcher__sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+  @keyframes launcher-in {
+    from { opacity: 0; transform: translateY(30px) scale(0.9); }
+  }
+  @keyframes launcher-glow {
+    0% { box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.9), 0 0 0 0 rgba(79, 209, 255, 0.45); }
+    70%, 100% { box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.9), 0 0 0 14px rgba(79, 209, 255, 0); }
+  }
+
+  .nudge {
+    position: fixed;
+    right: 20px;
+    bottom: 90px;
+    z-index: 95;
+    display: flex;
+    gap: 10px;
+    max-width: 290px;
+    padding: 14px 14px 14px 16px;
+    border-radius: 18px 18px 6px 18px;
+    background: var(--text);
+    color: var(--ink);
+    font-size: 14px;
+    box-shadow: 0 20px 50px -20px rgba(0, 0, 0, 0.9);
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+    transform-origin: bottom right;
+    transition: opacity 0.4s var(--ease-out), transform 0.4s var(--ease-out);
+    pointer-events: none;
+  }
+  .nudge.is-shown {
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
+  }
+  .nudge p {
+    margin: 0;
+  }
+  .nudge__close {
+    flex: none;
+    width: 24px;
+    height: 24px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(6, 8, 13, 0.08);
+    color: inherit;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  /* --- dialog --- */
+  .chat {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--text);
+    overflow: hidden;
+  }
+  .chat::backdrop {
+    background: rgba(4, 6, 10, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    animation: fade 0.35s ease both;
+  }
+  .chat[open] .chat__card {
+    animation: card-in 0.55s var(--ease-out) both;
+  }
+  .chat.is-closing .chat__card {
+    animation: card-out 0.28s ease-in both;
+  }
+  .chat.is-closing::backdrop {
+    animation: fade 0.28s ease reverse both;
+  }
+  .chat__card {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    width: min(440px, calc(100vw - 40px));
+    height: min(720px, calc(100dvh - 40px));
+    border-radius: 26px;
+    border: 1px solid var(--line-strong);
+    background: var(--panel);
+    box-shadow: 0 50px 120px -30px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(255, 255, 255, 0.03) inset;
+    overflow: hidden;
+    transform-origin: bottom right;
+  }
+  .chat__head {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 14px 14px 16px;
+    border-bottom: 1px solid var(--line);
+    background: linear-gradient(180deg, rgba(79, 209, 255, 0.08), transparent);
+  }
+  .chat__head img {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  .chat__who {
+    flex: 1;
+    min-width: 0;
+  }
+  .chat__title {
+    margin: 0;
+    font-weight: 650;
+  }
+  .chat__sub {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 1px 0 0;
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .chat__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--line);
+    border-radius: 50%;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: color 0.3s, border-color 0.3s, transform 0.4s var(--ease-out);
+  }
+  .chat__icon:hover {
+    color: var(--text);
+    border-color: var(--line-strong);
+  }
+  .chat__icon:last-child:hover {
+    transform: rotate(90deg);
+  }
+  .chat__icon svg {
+    width: 17px;
+    height: 17px;
+  }
+  .chat__frame {
+    position: relative;
+    flex: 1;
+    background: #fff;
+  }
+  .chat__frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+  .chat__loading {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 12px;
+    background: var(--panel);
+    color: var(--muted);
+    font-size: 12px;
+    transition: opacity 0.4s;
+  }
+  .chat__loading.is-done {
+    opacity: 0;
+    pointer-events: none;
+  }
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(40px) scale(0.92); }
+  }
+  @keyframes card-out {
+    to { opacity: 0; transform: translateY(24px) scale(0.95); }
+  }
+  @keyframes fade {
+    from { opacity: 0; }
+  }
+
+  @media (max-width: 900px) {
+    .ask__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 600px) {
+    .launcher {
+      right: 14px;
+      bottom: 14px;
+      padding-right: 7px;
+    }
+    .launcher__text {
+      display: none;
+    }
+    .nudge {
+      right: 14px;
+      bottom: 80px;
+      max-width: calc(100vw - 28px);
+    }
+    /* Full-screen sheet on phones. */
+    .chat__card {
+      inset: 0;
+      width: 100%;
+      height: 100dvh;
+      border-radius: 0;
+      border: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .launcher,
+    .chat[open] .chat__card,
+    .chat::backdrop,
+    .typing i {
+      animation: none;
+    }
+  }
+</style>
