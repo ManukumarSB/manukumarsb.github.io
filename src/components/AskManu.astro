@@ -575,15 +575,22 @@ import { profile, chat } from '../data/profile';
     height: 17px;
   }
   .chat__frame {
+    /* Honestify has no embed mode we can switch on, so crop its page to the
+       conversation: its top bar (61px) and footer links (~52px) sit outside
+       the clip. Re-measure if their layout changes. */
+    --crop-top: 61px;
+    --crop-bottom: 52px;
     position: relative;
     flex: 1;
+    overflow: hidden;
     background: #fff;
   }
   .chat__frame iframe {
     position: absolute;
-    inset: 0;
+    top: calc(-1 * var(--crop-top));
+    left: 0;
     width: 100%;
-    height: 100%;
+    height: calc(100% + var(--crop-top) + var(--crop-bottom));
     border: 0;
   }
   .chat__loading {
