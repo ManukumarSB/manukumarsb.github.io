@@ -88,6 +88,7 @@ import { profile, chat } from '../data/profile';
         title={`Chat with ${profile.shortName}'s AI assistant`}
         data-src={chat.url}
         allow="clipboard-write"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
         referrerpolicy="strict-origin-when-cross-origin"
         data-chat-frame
       ></iframe>

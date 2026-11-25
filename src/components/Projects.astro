@@ -1,7 +1,19 @@
 ---
+import { createHash } from 'node:crypto';
 import { projects } from '../data/profile';
 const pad = (n: number) => String(n).padStart(2, '0');
+
+// Per-card accents as a stylesheet rather than style="" attributes, which the
+// Content-Security-Policy would block.
+const accents = projects
+  .map((p, i) => `.proj:nth-child(${i + 1}){--accent:${p.accent}}`)
+  .join('');
+Astro.csp?.insertStyleHash(
+  `sha256-${createHash('sha256').update(accents).digest('base64')}`,
+);
 ---
+
+<style is:global set:html={accents}></style>
 
 <section class="projects" id="projects" data-hscroll>
   <div class="projects__pin">
@@ -23,7 +35,7 @@ const pad = (n: number) => String(n).padStart(2, '0');
         {projects.map((p, i) => {
           const Tag = p.url ? 'a' : 'div';
           return (
-            <li class="proj" style={`--accent:${p.accent}`}>
+            <li class="proj">
               <Tag
                 class="proj__card"
                 {...(p.url ? { href: p.url, target: '_blank', rel: 'noopener' } : {})}
